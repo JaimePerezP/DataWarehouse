@@ -3,26 +3,31 @@ package bbddavanzadas.datawarehouse;
 import java.io.FileReader;
 import java.io.IOException;
 
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
+
 /**
  * Hello world!
  *
  */
 public class App {
-		
+
 	public static void main(String[] args) {
-		String csvFile = "C:\\Users\\ulabjpp\\Desktop\\CAvideos.csv";
+		String csvFile = "data/CAvideos.csv";
 		CSVReader reader;
 		try {
 			reader = new CSVReader(new FileReader(csvFile));
 			String[] headLine = reader.readNext();
 			String[] line;
-			while ((line = reader.readNext()) != null) {	
+			while ((line = reader.readNext()) != null) {
 				for (int i = 0; i < line.length; i++) {
 					System.out.print(headLine[i] + ": " + line[i] + "; ");
 				}
 				System.out.println();
 			}
-		} catch (IOException | CsvValidationException e) {
+		} catch (IOException e) {
+			System.out.print(e);
+		} catch (CsvValidationException e) {
 			System.out.print(e);
 		}
 	}
