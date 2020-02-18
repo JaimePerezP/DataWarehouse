@@ -10,8 +10,8 @@ public class DBBroker {
 		Connection con = null;
 		
 	    String driver = "com.mysql.jdbc.Driver";
-	    String database = "databasemovies"; // Hay que crear la DB
-	    String hostname = "localhost";
+	    String database = "datawarehouse"; // Hay que crear la DB
+	    String hostname = "127.0.0.1";
 	    String port = "3306";
 	    String url = "jdbc:mysql://" + hostname + ":" + port + "/" + database + "?&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 	    String username = "root";
@@ -29,3 +29,4 @@ public class DBBroker {
 	}
 
 }
+
