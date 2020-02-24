@@ -11,6 +11,7 @@ public class App {
 
 	public static void main(String[] args) {
 		Connection con = DBBroker.connect();
+		DBBroker.createTables();
 	}
 
 	public static void parsear() {
