@@ -66,7 +66,7 @@ public class DBBroker {
         boolean rating_disabled = Boolean.getBoolean(video[13].toLowerCase());
         boolean video_error_or_remove = Boolean.getBoolean(video[14].toLowerCase());
         String descripcion = video[15];
-        exeSQLCode("INSERT INTO Dimension_Video (id_video, titulo, descripcion, tags, comments_disabled, ratings_disabled, video_error_or_removed, thumbnail_link) VALUES (" + id_video + "," + titulo_video + "," + descripcion + "," + tags + "," + comments_disabled + "," + rating_disabled + "," + video_error_or_remove + "," + thumbnail_link + ");");
+        exeSQLCode("INSERT INTO Dimension_Video (id_video, titulo, descripcion, tags, comments_disabled, ratings_disabled, video_error_or_removed, thumbnail_link) VALUES ('" + id_video + "','" + titulo_video + "','" + descripcion + "','" + tags + "'," + comments_disabled + "," + rating_disabled + "," + video_error_or_remove + ",'" + thumbnail_link + "');");
     }
 
     public void insertTiempo(String[] video, int id_tiempo) throws ParseException, SQLException {
@@ -74,7 +74,7 @@ public class DBBroker {
         String fPubli = video[5].replace('T', '-');
         LocalDateTime fecha_publi = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss").parse(fPubli).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         String hora_publi = fecha_publi.getHour() + ":" + fecha_publi.getMinute() + ":" + fecha_publi.getSecond();
-        exeSQLCode("INSERT INTO Dimension_Tiempo (id_tiempo, fecha_publi, año_publi, mes_publi, dia_publi, hora_publi, fecha_trend, año_trend, mes_trend, dia_trend) VALUES (" + id_tiempo + "," + fecha_publi.toString() + "," + fecha_publi.getYear() + "," + fecha_publi.getMonth().toString() + "," + fecha_publi.getDayOfMonth() + "," + hora_publi + "," + fecha_trend.toString() + "," + fecha_trend.getYear() + "," + fecha_trend.getMonth().toString() + "," + fecha_trend.getDayOfMonth() + ");");
+        exeSQLCode("INSERT INTO Dimension_Tiempo (id_tiempo, fecha_publi, año_publi, mes_publi, dia_publi, hora_publi, fecha_trend, año_trend, mes_trend, dia_trend) VALUES (" + id_tiempo + ",'" + fecha_publi.toString() + "'," + fecha_publi.getYear() + "," + fecha_publi.getMonthValue() + "," + fecha_publi.getDayOfMonth() + ",'" + hora_publi + "','" + fecha_trend.toString() + "'," + fecha_trend.getYear() + "," + fecha_trend.getMonthValue() + "," + fecha_trend.getDayOfMonth() + ");");
     }
 
     public void insertHecho(String[] video, String pais, int id) throws SQLException {
@@ -85,7 +85,7 @@ public class DBBroker {
         int likes = Integer.parseInt(video[8]);
         int dislikes = Integer.parseInt(video[9]);
         int num_comentarios = Integer.parseInt(video[10]);
-        exeSQLCode("INSERT INTO Hechos (id_video, titulo_canal, nombre_categoria, id_tiempo, pais, visitas, likes, dislikes, num_comentarios) VALUES (" + id_video + "," + titulo_canal + "," + categoria + "," + id + "," + pais + "," + visitas + "," + likes + "," + dislikes + "," + num_comentarios + ");");
+        exeSQLCode("INSERT INTO Hechos (id_video, titulo_canal, nombre_categoria, id_tiempo, pais, visitas, likes, dislikes, num_comentarios) VALUES ('" + id_video + "','" + titulo_canal + "','" + categoria + "'," + id + ",'" + pais + "'," + visitas + "," + likes + "," + dislikes + "," + num_comentarios + ");");
     }
 
 }
