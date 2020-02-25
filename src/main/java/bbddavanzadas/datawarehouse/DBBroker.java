@@ -2,75 +2,90 @@ package bbddavanzadas.datawarehouse;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 public class DBBroker {
 
-	public static Connection connect() {
-		Connection con = null;
-		String driver = "com.mysql.cj.jdbc.Driver";
+    private static Connection con;
+
+    public DBBroker() throws ClassNotFoundException, SQLException {
+        connect();
+    }
+
+    public static void connect() throws ClassNotFoundException, SQLException {
+        String driver = "com.mysql.cj.jdbc.Driver";
 //		Database de Jaime
 //		String database = "datawarehouse-youtube";
 //		Database de Jorge
-		String database = "datawarehouse"; // Hay que crear la DB
-		String hostname = "127.0.0.1";
-		String port = "3306";
-		String url = "jdbc:mysql://" + hostname + ":" + port + "/" + database
-				+ "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
-		String username = "root";
+        String database = "datawarehouse"; // Hay que crear la DB
+        String hostname = "127.0.0.1";
+        String port = "3306";
+        String url = "jdbc:mysql://" + hostname + ":" + port + "/" + database
+                + "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+        String username = "root";
 //		Contraseña de Jaime
 //		String password = "mysql";
 //		Contraseña de Jorge
-		String password = "jorgejaime123";
+        String password = "jorgejaime123";
 
-		try {
-			Class.forName(driver);
-			con = DriverManager.getConnection(url, username, password);
-			System.out.println("DB connected");
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		}
+        Class.forName(driver);
+        con = DriverManager.getConnection(url, username, password);
+        System.out.println("DB connected");
+    }
 
-		return con;
-	}
+    public void closeConnection() throws SQLException {
+        con.close();
+    }
 
-	public static void createTablesMySQL(String sql) {
-		System.out.println(sql);
-		try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
-			stmt.execute(sql);
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-	}
+    public void exeSQLCode(String code) throws SQLException {
+        System.out.println(code);
+        con.createStatement().execute(code);
+    }
 
-	public static void createTables() {
-		createTablesMySQL(
-				"CREATE TABLE IF NOT EXISTS Trending_Video_Youtube (\n id_video varchar(255) PRIMARY KEY,\n id_dates integer NOT NULL,\n id_options integer NOT NULL,\n id_group integer NOT NULL,\n id_statistics integer NOT NULL,\n title varchar(255) NOT NULL,\n channel_title varchar(255) NOT NULL,\n description varchar(255) NOT NULL,\n thumbnail_link varchar(255) NOT NULL\n);\n");
-		createTablesMySQL(
-				"CREATE TABLE IF NOT EXISTS Video_Date (\n id_dates integer PRIMARY KEY,\n trending_date date NOT NULL,\n publish_time date NOT NULL\n);\n");
-		createTablesMySQL(
-				"CREATE TABLE IF NOT EXISTS Video_Options (\n id_options integer PRIMARY KEY,\n retings_disabled varchar(255) NOT NULL,\n comments_disabled varchar(255) NOT NULL,\n video_error_or_removed varchar(255) NOT NULL\n);\n");
-		createTablesMySQL(
-				"CREATE TABLE IF NOT EXISTS Video_Group (\n id_group integer PRIMARY KEY,\n category_id integer NOT NULL,\n tags varchar(255) NOT NULL\n);\n");
-		createTablesMySQL(
-				"CREATE TABLE IF NOT EXISTS Video_Statistics (\n id_statistics integer PRIMARY KEY,\n views integer NOT NULL,\n likes integer NOT NULL,\n dislike integer NOT NULL,\n comments_count varchar(255) NOT NULL \n);\n");
-	}
+    public void createTables() throws SQLException {
+        exeSQLCode(
+                "CREATE TABLE IF NOT EXISTS Hechos (\n id_video varchar(255) PRIMARY KEY,\n titulo_canal varchar(255) PRIMARY KEY,\n nombre_categoria varchar(255) PRIMARY KEY,\n id_tiempo integer PRIMARY KEY,\n pais varchar(255) PRIMARY KEY,\n visitas integer NOT NULL,\n likes integer NOT NULL,\n dislikes integer NOT NULL,\n num_comentarios integer NOT NULL);\n");
+        exeSQLCode(
+                "CREATE TABLE IF NOT EXISTS Dimension_Video (\n id_video varchar(255) PRIMARY KEY,\n titulo varchar(255) NOT NULL,\n descripcion varchar(255) NOT NULL,\n tags varchar(255) NOT NULL,\n comments_disabled BOOLEAN NOT NULL,\n retings_disabled BOOLEAN NOT NULL,\n video_error_or_removed BOOLEAN NOT NULL,\n thumbnail_link varchar(255) NOT NULL);\n");
+        exeSQLCode(
+                "CREATE TABLE IF NOT EXISTS Dimension_Tiempo (\n id_tiempo integer PRIMARY KEY,\n fecha_publi DATE NOT NULL,\n año_publi integer NOT NULL,\n mes_publi integer NOT NULL,\n dia_publi integer NOT NULL,\n hora_publi TIME NOT NULL,\n fecha_trend DATE NOT NULL,\n año_trend integer NOT NULL,\n mes_trend integer NOT NULL,\n dia_trend integer NOT NULL);\n");
+        exeSQLCode("ALTER TABLE Hechos ADD FOREIGN KEY (id_video) REFERENCES Dimension_Video(id_video);");
+        exeSQLCode("ALTER TABLE Hechos ADD FOREIGN KEY (id_tiempo) REFERENCES Dimension_Video(id_tiempo);");
+    }
 
-	public static void insert() throws SQLException {
-		String query = "insert into Video_Group (id_group, category_id, tags)" + " values (?, ?, ?)";
-		
-		Connection con = connect();
-		// create the mysql insert preparedstatement
-		PreparedStatement preparedStmt = con.prepareStatement(query);
-		preparedStmt.setInt(1, 1);
-		preparedStmt.setInt(2, 2);
-		preparedStmt.setString(3, "Bien");
+    public void insertVideo(String[] video) throws SQLException {
+        String id_video = video[0];
+        String titulo_video = video[2];
+        String tags = video[6];
+        String thumbnail_link = video[11];
+        boolean comments_disabled = Boolean.getBoolean(video[12].toLowerCase());
+        boolean rating_disabled = Boolean.getBoolean(video[13].toLowerCase());
+        boolean video_error_or_remove = Boolean.getBoolean(video[14].toLowerCase());
+        String descripcion = video[15];
+        exeSQLCode("INSERT INTO Dimension_Video (id_video, titulo, descripcion, tags, comments_disabled, ratings_disabled, video_error_or_removed, thumbnail_link) VALUES (" + id_video + "," + titulo_video + "," + descripcion + "," + tags + "," + comments_disabled + "," + rating_disabled + "," + video_error_or_remove + "," + thumbnail_link + ");");
+    }
 
-		// execute the preparedstatement
-		preparedStmt.execute();
+    public void insertTiempo(String[] video, int id_tiempo) throws ParseException, SQLException {
+        LocalDateTime fecha_trend = new SimpleDateFormat("yy.dd.MM").parse(video[1]).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        String fPubli = video[5].replace('T', '-');
+        LocalDateTime fecha_publi = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss").parse(fPubli).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        String hora_publi = fecha_publi.getHour() + ":" + fecha_publi.getMinute() + ":" + fecha_publi.getSecond();
+        exeSQLCode("INSERT INTO Dimension_Tiempo (id_tiempo, fecha_publi, año_publi, mes_publi, dia_publi, hora_publi, fecha_trend, año_trend, mes_trend, dia_trend) VALUES (" + id_tiempo + "," + fecha_publi.toString() + "," + fecha_publi.getYear() + "," + fecha_publi.getMonth().toString() + "," + fecha_publi.getDayOfMonth() + "," + hora_publi + "," + fecha_trend.toString() + "," + fecha_trend.getYear() + "," + fecha_trend.getMonth().toString() + "," + fecha_trend.getDayOfMonth() + ");");
+    }
 
-	}
+    public void insertHecho(String[] video, String pais, int id) throws SQLException {
+        String id_video = video[0];
+        String titulo_canal = video[3];
+        String categoria = video[4];
+        int visitas = Integer.parseInt(video[7]);
+        int likes = Integer.parseInt(video[8]);
+        int dislikes = Integer.parseInt(video[9]);
+        int num_comentarios = Integer.parseInt(video[10]);
+        exeSQLCode("INSERT INTO Hechos (id_video, titulo_canal, nombre_categoria, id_tiempo, pais, visitas, likes, dislikes, num_comentarios) VALUES (" + id_video + "," + titulo_canal + "," + categoria + "," + id + "," + pais + "," + visitas + "," + likes + "," + dislikes + "," + num_comentarios + ");");
+    }
 
 }
