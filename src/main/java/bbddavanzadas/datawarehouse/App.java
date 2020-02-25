@@ -26,9 +26,10 @@ public class App {
             String[] line;
             int id = 0;
             while ((line = reader.readNext()) != null) {
-                broker.insertVideo(line, id++);
-                broker.insertTiempo(line, id++);
-                broker.insertHecho(line, "Canadá", id++);
+                broker.insertVideo(line, id);
+                broker.insertTiempo(line, id);
+                broker.insertHecho(line, "Canadá", id);
+                id++;
             }
         } catch (IOException e) {
             System.out.print(e);
