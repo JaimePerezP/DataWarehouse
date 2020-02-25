@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import java.text.ParseException;
+import java.util.ArrayList;
 
 public class App {
 
@@ -23,10 +24,14 @@ public class App {
         try {
             reader = new CSVReader(new FileReader(csvFile));
             reader.readNext();
+            ArrayList<String> video_ids = new ArrayList<String>();
             String[] line;
             int id = 0;
             while ((line = reader.readNext()) != null) {
-                broker.insertVideo(line, id);
+                if (!estaRepetido(line[0], video_ids)) {
+                    broker.insertVideo(line);
+                    video_ids.add(line[0]);
+                }
                 broker.insertTiempo(line, id);
                 broker.insertHecho(line, "Canadá", id);
                 id++;
@@ -36,6 +41,15 @@ public class App {
         } catch (CsvValidationException e) {
             System.out.print(e);
         }
+    }
+
+    public static boolean estaRepetido(String id, ArrayList<String> ids) {
+        for (String siguiente : ids) {
+            if (id.equals(siguiente)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
