@@ -10,10 +10,6 @@ import java.time.ZoneId;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.vdurmont.emoji.Emoji;
-import com.vdurmont.emoji.EmojiParser;
-
-import emoji4j.EmojiUtils;
 
 public class DBBroker {
 
@@ -49,7 +45,6 @@ public class DBBroker {
     }
 
     public void exeSQLCode(String code) throws SQLException {
-        System.out.println(code);
         con.createStatement().execute(code);
     }
 
@@ -63,59 +58,19 @@ public class DBBroker {
         exeSQLCode("ALTER TABLE Hechos ADD FOREIGN KEY (id_video) REFERENCES Dimension_Video(id_video);");
         exeSQLCode("ALTER TABLE Hechos ADD FOREIGN KEY (id_tiempo) REFERENCES Dimension_Tiempo(id_tiempo);");
     }
-    
-    private static boolean isEmoji(String message){
-        return message.matches("(?:[\uD83C\uDF00-\uD83D\uDDFF]|[\uD83E\uDD00-\uD83E\uDDFF]|" +
-                "[\uD83D\uDE00-\uD83D\uDE4F]|[\uD83D\uDE80-\uD83D\uDEFF]|" +
-                "[\u2600-\u26FF]\uFE0F?|[\u2700-\u27BF]\uFE0F?|\u24C2\uFE0F?|" +
-                "[\uD83C\uDDE6-\uD83C\uDDFF]{1,2}|" +
-                "[\uD83C\uDD70\uD83C\uDD71\uD83C\uDD7E\uD83C\uDD7F\uD83C\uDD8E\uD83C\uDD91-\uD83C\uDD9A]\uFE0F?|" +
-                "[\u0023\u002A\u0030-\u0039]\uFE0F?\u20E3|[\u2194-\u2199\u21A9-\u21AA]\uFE0F?|[\u2B05-\u2B07\u2B1B\u2B1C\u2B50\u2B55]\uFE0F?|" +
-                "[\u2934\u2935]\uFE0F?|[\u3030\u303D]\uFE0F?|[\u3297\u3299]\uFE0F?|" +
-                "[\uD83C\uDE01\uD83C\uDE02\uD83C\uDE1A\uD83C\uDE2F\uD83C\uDE32-\uD83C\uDE3A\uD83C\uDE50\uD83C\uDE51]\uFE0F?|" +
-                "[\u203C\u2049]\uFE0F?|[\u25AA\u25AB\u25B6\u25C0\u25FB-\u25FE]\uFE0F?|" +
-                "[\u00A9\u00AE]\uFE0F?|[\u2122\u2139]\uFE0F?|\uD83C\uDC04\uFE0F?|\uD83C\uDCCF\uFE0F?|" +
-                "[\u231A\u231B\u2328\u23CF\u23E9-\u23F3\u23F8-\u23FA]\uFE0F?)+");
-    }
 
     public void insertVideo(String[] video) throws SQLException {
         String id_video = video[0];
         String titulo_video = video[2];
         String tags = video[6];
         String thumbnail_link = video[11];
-        int comments_disabled = Boolean.getBoolean(video[12].toLowerCase()) ? 1:0;
-        int rating_disabled = Boolean.getBoolean(video[13].toLowerCase()) ? 1:0;
-        int video_error_or_remove = Boolean.getBoolean(video[14].toLowerCase()) ? 1:0;
+        int comments_disabled = Boolean.getBoolean(video[12].toLowerCase()) ? 1 : 0;
+        int rating_disabled = Boolean.getBoolean(video[13].toLowerCase()) ? 1 : 0;
+        int video_error_or_remove = Boolean.getBoolean(video[14].toLowerCase()) ? 1 : 0;
         String descripcion = video[15];
-        System.out.println(id_video);
-        System.out.println(titulo_video);
-        System.out.println(tags);
-        System.out.println(thumbnail_link);
-        System.out.println(comments_disabled);
-        System.out.println(rating_disabled);
-        System.out.println(video_error_or_remove);
-        System.out.println(descripcion);
-//        System.out.println("INSERT INTO Dimension_Video (id_video, titulo, descripcion, tags, comments_disabled, ratings_disabled, video_error_or_removed, thumbnail_link) VALUES ('" + id_video + "','" + titulo_video + "','" + descripcion + "','" + tags + "'," + comments_disabled + "," + rating_disabled + "," + video_error_or_remove + ",'" + thumbnail_link + "');");
-        titulo_video = titulo_video.replace("'", " ");
-        descripcion = descripcion.replace("'", " ");
-        titulo_video = titulo_video.replace("\"", " ");
-        descripcion = descripcion.replace("\"", " ");
-        descripcion = EmojiUtils.shortCodify(descripcion);
-        descripcion = EmojiParser.removeAllEmojis(descripcion);
-        titulo_video = EmojiParser.removeAllEmojis(titulo_video);
-        tags = EmojiParser.removeAllEmojis(tags);
-        String regex = "[^\\p{L}\\p{N}\\p{P}\\p{Z}]";
-        Pattern pattern = Pattern.compile(
-          regex, 
-          Pattern.UNICODE_CHARACTER_CLASS);
-        Matcher matcher = pattern.matcher(descripcion);
-        Matcher matcher2 = pattern.matcher(titulo_video);
-        Matcher matcher3 = pattern.matcher(tags);
-        tags = matcher3.replaceAll("");
-        titulo_video = matcher2.replaceAll("");
-        descripcion = matcher.replaceAll("");
-        tags = tags.replace("'", " ");
-        tags = tags.replace("\"", " ");
+        titulo_video = cleanString(titulo_video);
+        descripcion = cleanString(descripcion);
+        tags = cleanString(tags);
         exeSQLCode("INSERT INTO Dimension_Video (id_video, titulo, descripcion, tags, comments_disabled, retings_disabled, video_error_or_removed, thumbnail_link) VALUES ( \"" + id_video + "\",\"" + titulo_video + "\",\"" + descripcion + "\",\"" + tags + "\",\"" + comments_disabled + "\",\"" + rating_disabled + "\",\"" + video_error_or_remove + "\",\"" + thumbnail_link + "\");");
     }
 
@@ -136,6 +91,17 @@ public class DBBroker {
         int dislikes = Integer.parseInt(video[9]);
         int num_comentarios = Integer.parseInt(video[10]);
         exeSQLCode("INSERT INTO Hechos (id_video, titulo_canal, nombre_categoria, id_tiempo, pais, visitas, likes, dislikes, num_comentarios) VALUES (\"" + id_video + "\",\"" + titulo_canal + "\",\"" + categoria + "\"," + id + ",\"" + pais + "\"," + visitas + "," + likes + "," + dislikes + "," + num_comentarios + ");");
+    }
+
+    public String cleanString(String cadena) {
+        cadena = cadena.replace("'", " ");
+        cadena = cadena.replace("\"", " ");
+        String regex = "[^\\p{L}\\p{N}\\p{P}\\p{Z}]";
+        Pattern pattern = Pattern.compile(
+                regex,
+                Pattern.UNICODE_CHARACTER_CLASS);
+        Matcher matcher = pattern.matcher(cadena);
+        return matcher.replaceAll("");
     }
 
 }
