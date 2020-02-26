@@ -91,6 +91,7 @@ public class DBBroker {
         int dislikes = Integer.parseInt(video[9]);
         int num_comentarios = Integer.parseInt(video[10]);
         exeSQLCode("INSERT INTO Hechos (id_video, titulo_canal, nombre_categoria, id_tiempo, pais, visitas, likes, dislikes, num_comentarios) VALUES (\"" + id_video + "\",\"" + titulo_canal + "\",\"" + categoria + "\"," + id + ",\"" + pais + "\"," + visitas + "," + likes + "," + dislikes + "," + num_comentarios + ");");
+        System.out.println("Inserted video with id: " + id_video);
     }
 
     public String cleanString(String cadena) {
