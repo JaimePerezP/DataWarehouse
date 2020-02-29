@@ -52,7 +52,7 @@ public class DBBroker {
         exeSQLCode(
                 "CREATE TABLE IF NOT EXISTS Hechos (\n id_video varchar(255) ,\n titulo_canal varchar(255),\n nombre_categoria varchar(255),\n id_tiempo integer,\n pais varchar(255),\n visitas integer NOT NULL,\n likes integer NOT NULL,\n dislikes integer NOT NULL,\n num_comentarios integer NOT NULL, \n PRIMARY KEY(id_video, titulo_canal, nombre_categoria, id_tiempo, pais)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8;\n");
         exeSQLCode(
-                "CREATE TABLE IF NOT EXISTS Dimension_Video (\n id_video varchar(255) PRIMARY KEY,\n titulo varchar(255) NOT NULL,\n descripcion varchar(7022) NOT NULL,\n tags varchar(1500) NOT NULL,\n comments_disabled BOOLEAN NOT NULL,\n retings_disabled BOOLEAN NOT NULL,\n video_error_or_removed BOOLEAN NOT NULL,\n thumbnail_link varchar(255) NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8;\n");
+                "CREATE TABLE IF NOT EXISTS Dimension_Video (\n id_video varchar(255) PRIMARY KEY,\n titulo varchar(255) NOT NULL,\n descripcion nvarchar(7022) NOT NULL,\n tags nvarchar(5022) NOT NULL,\n comments_disabled BOOLEAN NOT NULL,\n retings_disabled BOOLEAN NOT NULL,\n video_error_or_removed BOOLEAN NOT NULL,\n thumbnail_link varchar(255) NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8;\n");
         exeSQLCode(
                 "CREATE TABLE IF NOT EXISTS Dimension_Tiempo (\n id_tiempo integer PRIMARY KEY,\n fecha_publi DATE NOT NULL,\n año_publi integer NOT NULL,\n mes_publi integer NOT NULL,\n dia_publi integer NOT NULL,\n hora_publi TIME NOT NULL,\n fecha_trend DATE NOT NULL,\n año_trend integer NOT NULL,\n mes_trend integer NOT NULL,\n dia_trend integer NOT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8;\n");
         exeSQLCode("ALTER TABLE Hechos ADD FOREIGN KEY (id_video) REFERENCES Dimension_Video(id_video);");
@@ -85,13 +85,14 @@ public class DBBroker {
     public void insertHecho(String[] video, String pais, int id) throws SQLException {
         String id_video = video[0];
         String titulo_canal = video[3];
+        titulo_canal = cleanString(titulo_canal);
         String categoria = video[4];
         int visitas = Integer.parseInt(video[7]);
         int likes = Integer.parseInt(video[8]);
         int dislikes = Integer.parseInt(video[9]);
         int num_comentarios = Integer.parseInt(video[10]);
         exeSQLCode("INSERT INTO Hechos (id_video, titulo_canal, nombre_categoria, id_tiempo, pais, visitas, likes, dislikes, num_comentarios) VALUES (\"" + id_video + "\",\"" + titulo_canal + "\",\"" + categoria + "\"," + id + ",\"" + pais + "\"," + visitas + "," + likes + "," + dislikes + "," + num_comentarios + ");");
-        System.out.println("Inserted video with id: " + id_video);
+        System.out.println("Inserted video with id: " + id_video + "\tPaís: " + pais);
     }
 
     public String cleanString(String cadena) {
