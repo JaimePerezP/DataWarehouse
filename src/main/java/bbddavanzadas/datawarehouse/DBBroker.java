@@ -24,7 +24,7 @@ public class DBBroker {
 //		Database de Jaime
 //		String database = "datawarehouse-youtube";
 //		Database de Jorge
-        String database = "datawarehouse"; // Hay que crear la DB
+        String database = "datawarehouse-youtube"; // Hay que crear la DB
         String hostname = "127.0.0.1";
         String port = "3306";
         String url = "jdbc:mysql://" + hostname + ":" + port + "/" + database
@@ -33,7 +33,7 @@ public class DBBroker {
 //		Contraseña de Jaime
 //		String password = "mysql";
 //		Contraseña de Jorge
-        String password = "jorgejaime123";
+        String password = "mysql";
 
         Class.forName(driver);
         con = DriverManager.getConnection(url, username, password);
