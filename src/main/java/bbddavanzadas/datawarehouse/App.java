@@ -21,13 +21,12 @@ public class App {
 	public static void main(String[] args) throws SQLException, ClassNotFoundException, ParseException, IOException {
 		DBBroker broker = new DBBroker();
 		broker.createTables();
+		parsear("data/JPvideos.csv", "Japón", broker, getJSONCateogrias("data/JP_category_id.json"));
 		parsear("data/CAvideos.csv", "Canadá", broker, getJSONCateogrias("data/CA_category_id.json"));
 		parsear("data/FRvideos.csv", "Francia", broker, getJSONCateogrias("data/FR_category_id.json"));
 		parsear("data/MXvideos.csv", "México", broker, getJSONCateogrias("data/MX_category_id.json"));
 		parsear("data/USvideos.csv", "USA", broker, getJSONCateogrias("data/US_category_id.json"));
 		parsear("data/GBvideos.csv", "Gran Bretaña", broker, getJSONCateogrias("data/GB_category_id.json"));
-		parsear("data/INvideos.csv", "India", broker, getJSONCateogrias("data/IN_category_id.json"));
-		parsear("data/JPvideos.csv", "Japón", broker, getJSONCateogrias("data/JP_category_id.json"));
 		broker.closeConnection();
 	}
 
