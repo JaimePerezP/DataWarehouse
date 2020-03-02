@@ -33,7 +33,7 @@ FROM Dimension_video
 WHERE comments_disabled = 1 AND retings_disabled = 1;
 
 /*Tiempo medio en días de llegada a tendencias por categorías*/
-SELECT h.nombre_categoria, AVG(t.dia_trend-t.dia_publi) media
+SELECT h.nombre_categoria, AVG(DATEDIFF(t.fecha_trend, t.fecha_publi)) media
 FROM Hechos h, Dimension_tiempo t
 WHERE h.id_tiempo = t.id_tiempo
 GROUP BY nombre_categoria
