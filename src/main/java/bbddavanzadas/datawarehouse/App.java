@@ -43,7 +43,7 @@ public class App {
 				JSONArray cs = categorias.getJSONArray("items");
 				for (int i = 0; i < cs.length(); i++) {
 					JSONObject categoria = cs.getJSONObject(i);
-					if(categoria.getString("id").contentEquals(line[4])) {
+					if (categoria.getString("id").contentEquals(line[4])) {
 						JSONObject snippet = categoria.getJSONObject("snippet");
 						line[4] = snippet.getString("title");
 					}
@@ -55,6 +55,7 @@ public class App {
 					broker.insertVideo(rows.get(i));
 					video_ids.add(rows.get(i)[0]);
 				}
+				System.out.print(i + "|" + id + " ");
 				broker.insertTiempo(rows.get(i), id);
 				broker.insertHecho(rows.get(i), pais, id);
 				id++;

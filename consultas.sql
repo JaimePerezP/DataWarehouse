@@ -38,3 +38,44 @@ FROM Hechos h, Dimension_tiempo t
 WHERE h.id_tiempo = t.id_tiempo
 GROUP BY nombre_categoria
 ORDER BY media;
+
+/*Vídeo con mejor proporción likes/dislikes*/
+SELECT v.titulo, MAX(prop)
+FROM (
+	SELECT v.titulo, h.likes/h.dislikes prop
+    FROM Dimension_video v, Hechos h
+    WHERE v.id_video = h.id_video
+    GROUP BY v.id_video) AS v;
+    
+/*Categoría con mejor proporción likes/dislikes*/
+SELECT nombre_categoria, MAX(prop)
+FROM (
+	SELECT nombre_categoria, likes/dislikes prop
+    FROM Hechos
+    GROUP BY nombre_categoria) AS v;
+    
+/*Categorías por visitas*/
+SELECT nombre_categoria, visitas
+FROM Hechos
+GROUP BY nombre_categoria
+ORDER BY visitas DESC;
+
+/*Categorias por proporción comentarios-likes-dislikes/visitas*/
+SELECT nombre_categoria, (num_comentarios+likes+dislikes)/visitas prop
+FROM Hechos
+GROUP BY nombre_categoria
+ORDER BY prop DESC;
+
+/*Videos com likes positivos y num de comentarios*/
+SELECT AVG(num_comentarios)
+FROM (
+	SELECT likes/dislikes prop, num_comentarios
+    FROM Hechos
+    HAVING prop > 1) AS v;
+    
+/*Videos com likes negativos y num de comentarios*/
+SELECT AVG(num_comentarios)
+FROM (
+	SELECT likes/dislikes prop, num_comentarios
+    FROM Hechos
+    HAVING prop < 1) AS v;
